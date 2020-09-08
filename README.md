@@ -5,5 +5,5 @@ Repository for our course project can be seen [here](https://github.com/yugeshk/
 
 ## Contributors
 
-### Baldip Bijlani
-### Yugesh Kothari
+### Baldip Bijlani [baldip123](https://github.com/baldip123)
+### Yugesh Kothari [yugeshk](https://github.com/yugeshk/)
