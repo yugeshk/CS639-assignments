@@ -13,14 +13,17 @@ class Analyzer():
         print("Here is the Answer:\n")
     	
         print('Loop Conditions:')
+        print('[line, col]')
         print(('\n').join(self.stats['loop_conditions']))
         print()
         
         print('Branch Conditions:')
+        print('[line, col]')
         print(('\n').join(self.stats['branch_conditions']))
         print()
         
         print('AssignmentStatements:')
+        print('[line, col]')
         print(('\n').join(self.stats['assignment_statements']))
         print()
 
@@ -67,40 +70,40 @@ class Analyzer():
         iter_ = node['iter']
         target_text = self.get_node_text(target)
         iter_text = self.get_node_text(iter_)
-        self.stats['loop_conditions'].append(target_text + ' in ' + iter_text)
+        self.stats['loop_conditions'].append(self.format_lineno(target)+target_text + ' in ' + iter_text)
         
     def visit_AsyncFor(self, node):
         target = node['target']
         iter_ = node['iter']
         target_text = self.get_node_text(target)
         iter_text = self.get_node_text(iter_)
-        self.stats['loop_conditions'].append(target_text + ' in ' + iter_text)
+        self.stats['loop_conditions'].append(self.format_lineno(target)+target_text + ' in ' + iter_text)
     
     def visit_While(self, node):
         test = node['test']
-        test_text = self.get_node_text(test)
+        test_text = self.format_lineno(test) + self.get_node_text(test)
         self.stats['loop_conditions'].append(test_text)
         
     def visit_Assign(self, node):
-        text = self.get_node_text(node)
+        text = self.format_lineno(node)+self.get_node_text(node)
         self.stats['assignment_statements'].append(text)
     
     def visit_AugAssign(self, node):
-        text = self.get_node_text(node)
+        text = self.format_lineno(node)+self.get_node_text(node)
         self.stats['assignment_statements'].append(text)
     
     def visit_AnnAssign(self, node):
-        text = self.get_node_text(node)
+        text = self.format_lineno(node)+self.get_node_text(node)
         self.stats['assignment_statements'].append(text)
     
     def visit_If(self, node):
         test = node['test']
-        test_text = self.get_node_text(test)
+        test_text = self.format_lineno(test) + self.get_node_text(test)
         self.stats['branch_conditions'].append(test_text)
     
     def visit_IfExp(self, node):
         test = node['test']
-        test_text = self.get_node_text(test)
+        test_text = self.format_lineno(test) + self.get_node_text(test)
         self.stats['branch_conditions'].append(test_text)
 
     
@@ -114,6 +117,7 @@ class Analyzer():
                 text+='\n'
                 text+=lines[i]
             
+            text+='\n'
             text += lines[line2-1][:col2]
             return text
         
@@ -123,6 +127,9 @@ class Analyzer():
         c1 = node['col_offset']
         c2 = node['end_col_offset']
         return self.subset_program_text(l1, c1, l2, c2)
+    
+    def format_lineno(self, node):
+        return "[" + str(node['lineno']) + " ,"+ str(node['col_offset']) + "]: "
 
 if __name__ == "__main__":
     source_file_address = sys.argv[1]

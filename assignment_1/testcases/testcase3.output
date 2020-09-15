@@ -1,0 +1,30 @@
+Here is the Answer:
+
+Loop Conditions:
+[line, col]
+
+
+Branch Conditions:
+[line, col]
+[27 ,7]: '.' in file_name
+[41 ,3]: __name__ == '__main__'
+[47 ,7]: not args.url
+[50 ,9]: not args.url.startswith("http")
+[56 ,7]: platform.system() == 'Windows'
+
+AssignmentStatements:
+[line, col]
+[15 ,4]: file_name = url.split('/')[-1]
+[26 ,4]: file_name = name
+[28 ,8]: file_name = file_name.split('.')[0]
+[29 ,4]: timestr = time.strftime("%Y%m%d-%H%M%S")
+[30 ,4]: unique_name = file_name + '-' + timestr
+[42 ,4]: parser = argparse.ArgumentParser()
+[45 ,4]: args = parser.parse_args()
+[54 ,4]: url = args.url
+[55 ,4]: password = bytes(args.password, encoding='utf-8')
+[57 ,8]: sep = '\\'
+[59 ,8]: sep = '/'
+[60 ,4]: download_name = download_file(url)
+[61 ,4]: archive_name, directory_name = make_directory(download_name)
+

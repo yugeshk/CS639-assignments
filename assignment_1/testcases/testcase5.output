@@ -1,0 +1,102 @@
+Here is the Answer:
+
+Loop Conditions:
+[line, col]
+[48 ,8]: line in data
+[63 ,12]: entry in (path for path in ftp_obj.nlst() if path not in ('.', '..'))
+[81 ,12]: item in directories
+[109 ,10]: True
+[167 ,8]: i in range(args.threads)
+[171 ,8]: addr in addrs
+[258 ,16]: addr in ip_addrs
+
+Branch Conditions:
+[line, col]
+[6 ,3]: not sys.version.startswith('3')
+[33 ,7]: not os.path.isfile(csv_name)
+[59 ,7]: depth > max_depth
+[75 ,7]: entries is {}
+[93 ,39]: len(list(c)) == 2
+[126 ,11]: args.verbose
+[130 ,11]: args.verbose
+[137 ,7]: args.anon_login
+[139 ,11]: login_message != ''
+[144 ,15]: args.verbose
+[150 ,7]: args.list_dir
+[152 ,11]: anonymous_login is True
+[155 ,15]: dirs
+[158 ,15]: args.verbose
+[174 ,7]: args.csv
+[178 ,3]: __name__ == '__main__'
+[214 ,7]: not args.input_filename and not args.range and not args.ipaddress
+[218 ,7]: args.input_filename
+[219 ,11]: not os.path.exists(args.input_filename)
+[224 ,7]: args.range
+[225 ,11]: not '-' in args.range and not '/' in args.range
+[226 ,15]: sys.version.startswith('3')
+[241 ,11]: '-' in args.range
+[242 ,15]: '/' in args.range
+[243 ,19]: sys.version.startswith('3')
+[251 ,15]: not re.findall(dash_regex, args.range)
+[261 ,19]: invalid_addr
+[264 ,13]: '/' in args.range
+[265 ,15]: sys.version.startswith('2')
+[272 ,19]: not re.findall(cidr_regex, args.range)
+[283 ,7]: args.ipaddress
+[284 ,11]: '/' in args.ipaddress
+[287 ,11]: '.' not in args.ipaddress
+[291 ,7]: args.csv
+[295 ,11]: os.path.exists(csv_name)
+
+AssignmentStatements:
+[line, col]
+[23 ,4]: login_message = ''
+[25 ,8]: login_message = ftp_obj.login()
+[34 ,8]: csv_file = open(csv_name, 'w', newline='')
+[35 ,8]: csv_writer = csv.writer(csv_file)
+[36 ,8]: top_row = ['Host', 'Port', 'Banner', 'Anonymous Login', 'Directory Listing']
+[41 ,12]: csv_file = open(csv_name, 'a', newline='')
+[46 ,8]: csv_writer = csv.writer(csv_file)
+[61 ,4]: entries = {}
+[66 ,16]: entries[entry] = list_directories(ftp_obj, depth + 1)
+[69 ,16]: entries[entry] = None
+[78 ,12]: directories = ftp_obj.nlst()
+[82 ,12]: entries[item] = ''
+[91 ,4]: octets = input_string.split('.')
+[92 ,4]: chunks = [list(map(int, octet.split('-'))) for octet in octets]
+[93 ,4]: ranges = [range(c[0], c[1] + 1) if len(list(c)) == 2 else c for c in chunks]
+[94 ,4]: addrs = ['.'.join(list(map(str, address))) for address in itertools.product(*ranges)]
+[102 ,4]: addr_obj = ipaddress.ip_network(input_string)
+[103 ,4]: addrs = [str(addr) for addr in addr_obj.hosts()]
+[110 ,8]: current_host = host_queue.get()
+[120 ,4]: host_data = []
+[121 ,4]: ftp = ftplib.FTP()
+[123 ,8]: banner = ftp.connect(addr, port, timeout=5)
+[136 ,4]: anonymous_login = False
+[138 ,8]: login_message = ftp_anon_login(ftp)
+[142 ,12]: anonymous_login = True
+[149 ,4]: all_dirs = ''
+[151 ,8]: all_dirs = ''
+[153 ,12]: dirs = list_directories(ftp)
+[154 ,12]: all_dirs = pprint.pformat(dirs)
+[168 ,8]: t = threading.Thread(target=process_queue)
+[169 ,8]: t.daemon = True
+[179 ,4]: parser = argparse.ArgumentParser()
+[212 ,4]: args = parser.parse_args()
+[223 ,8]: addrs = open(args.input_filename).read().splitlines()
+[236 ,8]: cidr_regex = r'^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$'
+[239 ,8]: dash_regex = r'^[\d+-?]{1,7}\.[\d+-?]{1,7}\.[\d+-?]{1,7}\.[\d+-?]{1,7}$'
+[255 ,12]: ip_addrs = ip_range(args.range)
+[257 ,12]: addrs = []
+[259 ,16]: octets = str(addr).split('.')
+[260 ,16]: invalid_addr = [octet for octet in octets if int(octet) > 255]
+[276 ,16]: addrs = cidr_ip_range(args.range)
+[290 ,8]: addrs = [args.ipaddress]
+[292 ,8]: csv_name = args.csv
+[297 ,16]: csv_file = open(csv_name, 'a', newline='')
+[304 ,4]: port = args.port
+[305 ,4]: max_depth = args.list_dir
+[306 ,4]: lock = threading.Lock()
+[307 ,4]: host_queue = Queue()
+[311 ,4]: data = []
+

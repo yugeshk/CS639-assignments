@@ -1,0 +1,18 @@
+Here is the Answer:
+
+Loop Conditions:
+[line, col]
+
+
+Branch Conditions:
+[line, col]
+[17 ,11]: stderr.channel.recv_exit_status() != 0
+[22 ,3]: __name__ == '__main__'
+
+AssignmentStatements:
+[line, col]
+[6 ,0]: k = paramiko.RSAKey.from_private_key_file("path_to_encrypted_key", password='password_encrypted_key')
+[10 ,8]: self.ssh = SSHClient()
+[16 ,8]: stdin,stdout,stderr = self.ssh.exec_command(cmd)
+[23 ,4]: ssh = SSH()
+

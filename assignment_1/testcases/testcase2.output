@@ -1,0 +1,27 @@
+Here is the Answer:
+
+Loop Conditions:
+[line, col]
+[34 ,4]: i, j in both
+[37 ,10]: len(char_pos) < 6
+
+Branch Conditions:
+[line, col]
+[18 ,3]: len(sys.argv) != 3
+[39 ,7]: i == j
+[42 ,11]: not i
+[44 ,11]: not j
+
+AssignmentStatements:
+[line, col]
+[16 ,0]: usage = "Usage: ./string_diff.py <string1> <string2>"
+[22 ,0]: string1 = sys.argv[1]
+[23 ,0]: string2 = sys.argv[2]
+[26 ,4]: both = zip_longest(string1, string2)
+[33 ,0]: char_num = 0
+[35 ,4]: char_num += 1
+[36 ,4]: char_pos = str(char_num)
+[38 ,8]: char_pos += ' '
+[43 ,12]: i = ' '
+[45 ,12]: j = ' '
+
