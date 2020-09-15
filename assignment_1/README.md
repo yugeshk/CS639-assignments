@@ -11,7 +11,10 @@ Using the lineno, col_offset, end_lineno, and end_col_offset fields of these nod
 ### How to build and run:
 
 To run this utility, you must have `python3.8`, `pip3.8` and `ast2json` python package installed. Scripts will complain if these are not present.
-This utility contains a script `setup_env.sh` that will setup a virtualenv and install necessary packages (incase you want to use a virtualenv).
+This utility contains a script `setup_env.sh` that will setup a virtualenv and install necessary packages (incase you want to use a virtualenv). To setup the virtualenv do:
+
+    ./setup_env.sh
+    source venv/bin/activate
 
 To run this utility simply run the following command in the base directory:
 
