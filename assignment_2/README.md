@@ -1,12 +1,10 @@
 ## REPORT : 
 
 ### Implementation Details:
-
-We dumped the json corresponding to a file created using ast to json. After that we read the json using the json library. We wrote a function that recursively reads a json object called visit_node, which takes as input a node and recursively visits it's children.
+We dumped the json corresponding to a file created using ast to json. After that we read the json using the json library. We wrote a function called visit_Body which takes a list of statements and translates them to 3AC code recursively. We also write specific function for constructs like While, If, and If-Else, for their translation. Our translation is based on the following attribute grammar to translate control flow statements to Three AC code taught in CS335.(Page 84 of https://www.cse.iitk.ac.in/users/swarnendu/courses/cs335/Intermediate%20Representations.pdf)
     
-On the basis of the "type" field of each node we wrote different functions to handle different types of node. For instance, if we encounter a node of type For, we get the it's children corresponding to "target" and "iter" fields which give us the loop variables, and the object being iterated over. 
+After the translation is complete we use the algorithm to identify leaders, create basic blocks and Identify edges between basic blocks. After Finding the basic blocks and edges we generate a dot script corresponding to this graph.
     
-Using the lineno, col_offset, end_lineno, and end_col_offset fields of these nodes, we get the text corresponding to these constructs, and store that text. After we are done with the whole json object we print the text that was accumulated. 
 
 ### How to build and run:
 
