@@ -1,6 +1,8 @@
-from ast2json import *
 import json
-import ast
+import sys
+
+
+
 
 class Translator():
     def __init__(self):
@@ -201,4 +203,17 @@ class Translator():
     def format_lineno(self, node):
         return "At line " + str(node['lineno']) + " :"
             
-    
+            
+def remove_infeasible_labels(code, jump_targets):
+    new_code = ''
+    for line in code.split('\n'):
+        if(line.count(':') > 1):
+            raise Exception('Multiple labels for same statement')
+        elif(line.count(':') == 1):
+            if(int(line.split(':')[0].split('L')[1]) in jump_targets):
+                new_code+=line+'\n'
+            else:
+                new_code += line.split(':')[1][1:]+'\n'
+        else:
+            new_code+=line+'\n'
+    return new_code
