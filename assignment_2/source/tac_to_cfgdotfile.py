@@ -9,6 +9,7 @@ import os
 import pydotplus
 from subprocess import check_call
 from program import Program
+import re
 
 #Global variables
 tac_filename = sys.argv[1]
@@ -34,7 +35,15 @@ def add_tac_BasicBlocks(cfg, tac_BBlist):
         for i in instr_list:
             if i == '':
                 continue
-            label_attr += '  ' + escape_string(i) + '\\l'
+            if re.match(r'^(L[0-9]+:)', i):
+                groups = re.search(r'^(L[0-9]+:)(.*)', i)
+                tac_label = groups[1]
+                rem_instr = groups[2]
+                label_attr += ' ' + tac_label + '\\l'
+                if rem_instr != '':
+                    label_attr += '  ' + rem_instr + '\\l'
+            else:
+                label_attr += '  ' + escape_string(i) + '\\l'
         label_attr += '}"'
         node_attrs['label'] = label_attr
         graphviz_node = pydotplus.graphviz.Node(name='{}'.format(b_id), **node_attrs)
