@@ -1,3 +1,7 @@
+"""
+Utility File with Classes to handle the TAC program generated.
+Takes as input a tac program in string format and breaks into BasicBlocks and Edges
+"""
 
 class Statement():
     def __init__(self, text, line_index):
