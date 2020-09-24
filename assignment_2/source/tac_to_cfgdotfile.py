@@ -1,6 +1,7 @@
 """
-Converts a Three-Address-Code file to CFG and outputs as .dot and .png
-Usage : python tac_to_cfgdotfile.py <filename>.tac <filename>.dot <filename>.png
+Converts a Three-Address-Code file to CFG and outputs as .dot and .png (or other format as specified)
+Usage : python tac_to_cfgdotfile.py <filename>.tac <filename>.dot <filename>.png (or .pdf etc)
+Supported formats : png, 
 """
 
 import sys
@@ -11,7 +12,7 @@ from subprocess import check_call
 #Global variables
 tac_filename = sys.argv[1]
 dot_filename = sys.argv[2]
-png_filename = sys.argv[3]
+cfg_filename = sys.argv[3]
 
 class Statement():
     def __init__(self, text, line_index):
@@ -158,7 +159,7 @@ def add_tac_edges(cfg, tac_edgelist):
 if __name__ == "__main__":
 
     #Initialize Graphviz CFG object
-    cfg_attrs = {'label': 'CFG for {}'.format(tac_filename)}
+    cfg_attrs = {'label': 'CFG for {}'.format(os.path.basename(tac_filename))}
     cfg = pydotplus.graphviz.Graph(graph_name="CFG for {}".format(tac_filename), graph_type='digraph', **cfg_attrs)
 
     with open(tac_filename, 'r') as tac_file:
@@ -177,7 +178,11 @@ if __name__ == "__main__":
 
     # Generate png
     # TODO : support more formats like svg, pdf, jpg
-    check_call(['dot', '-Tpng', dot_filename, '-o', png_filename])
+    # NOTE : pydotplus needs the GraphViz binaries to be installed anyway so using them should not be a problem
+    # In any case, ensure that the use has GraphViz binaries installed
+    _ ,output_format = os.path.splitext(cfg_filename)
+    output_format = output_format[1:] #to remove the starting .
+    check_call(['dot', '-T{}'.format(output_format), dot_filename, '-o', cfg_filename])
 
     
 
