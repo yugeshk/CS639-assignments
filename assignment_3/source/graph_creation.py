@@ -1,10 +1,86 @@
+class VariableFinder():
+    def findVariables(self, node):
+        if(node['_type'] == 'BoolOp'):
+            return self.visit_BoolOp(node)
+        elif(node['_type'] == 'BinOp'):
+            return self.visit_BinOp(node)
+        elif(node['_type'] == 'UnaryOp'):
+            return self.visit_UnaryOp(node)
+        elif(node['_type'] == 'Compare'):
+            return self.visit_Compare(node)
+        elif(node['_type'] == 'Call'):
+            return self.visit_Call(node)
+        elif(node['_type'] == 'Constant'):
+            return set()
+        elif(node['_type'] == 'Name'):
+            return set([node['id']])
+            
+    def visit_BoolOp(self, node):
+        ans = set()
+        for value in node['values']:
+            ans = ans.union(self.findVariables(value))
+        return ans
+            
+    def visit_BinOp(self, node):
+        ans = set()
+        ans = ans.union(self.findVariables(node['right']))
+        ans = ans.union(self.findVariables(node['left']))
+        return ans
+    
+    def visit_UnaryOp(self, node):
+        ans = set()
+        ans = ans.union(self.findVariables(node['operand']))
+        return ans
+    
+    def visit_Call(self, node):
+        ans = set()
+        for arg in node['args']:
+            ans = ans.union(self.findVariables(arg))
+            
+        for keyword in node['keywords']:
+            ans = ans.union(self.findVariables(keyword['value']))
+            
+        return ans
+            
+    def visit_Compare(self, node):
+        ans = set()
+        ans = ans.union(self.findVariables(node['left']))
+        for cmp in node['comparators']:
+            ans = ans.union(self.findVariables(cmp))
+        
+        return ans
 
 
+        self.node = node
 
 class Statement():
     def __init__(self, text, node):
         self.text = text
         self.node = node
+        self.defined = set()
+        self.used = set()
+        var_finder = VariableFinder()
+        if(node == None):
+            self.defined = set()
+            self.used = text.split('[')[1].split(']')[0]
+        elif(node['_type'] == 'Assign'):
+            self.defined = set()
+            for target in node['targets']:
+                self.defined = self.defined.union([target['id']])
+                
+            self.used = var_finder.findVariables(node['value'])
+            
+        elif(node['_type'] == 'AugAssign'):
+            self.defined = set()
+            self.defined = self.defined.union([node['target']['id']])
+            
+            self.used = set()
+            self.used = self.used.union([node['target']['id']])
+            self.used = self.used.union(var_finder.findVariables(node['value']))
+        
+        elif(node['_type'] == 'Expr'):
+            self.defined = set()
+            self.used = var_finder.findVariables(node['value'])
 
 class BasicBlock():
     def __init__(self):
@@ -33,6 +109,7 @@ class Graph():
         assert(type(ind1) == int)
         assert(type(ind2) == int)
         self.edges.append((ind1, ind2))
+
         
 
 class GraphGenerator():
@@ -118,11 +195,11 @@ class GraphGenerator():
         
     def visit_Assign(self, node):
         curr_block = self.graph.vertices[self.curr_block_index]
-        curr_block.add(Statement(self.get_node_text(node), None))
+        curr_block.add(Statement(self.get_node_text(node), node))
     
     def visit_AugAssign(self, node):
         curr_block = self.graph.vertices[self.curr_block_index]
-        curr_block.add(Statement(self.get_node_text(node), None))
+        curr_block.add(Statement(self.get_node_text(node), node))
     
     def visit_If(self, node):
         #add the brach condition to the current block
@@ -190,7 +267,7 @@ class GraphGenerator():
         
     def visit_Expr(self, node):
         curr_block = self.graph.vertices[self.curr_block_index]
-        curr_block.add(Statement(self.get_node_text(node), None))
+        curr_block.add(Statement(self.get_node_text(node), node))
     
     def subset_program_text(self, line1, col1, line2, col2):
         lines = self.program_text.splitlines()
@@ -215,56 +292,3 @@ class GraphGenerator():
         
     def format_lineno(self, node):
         return "At line " + str(node['lineno']) + " :"
-        
-class VariableFinder():
-    def findVariables(self, node):
-        if(node['_type'] == 'BoolOp'):
-            return self.visit_BoolOp(node)
-        elif(node['_type'] == 'BinOp'):
-            return self.visit_BinOp(node)
-        elif(node['_type'] == 'UnaryOp'):
-            return self.visit_UnaryOp(node)
-        elif(node['_type'] == 'Compare'):
-            return self.visit_Compare(node)
-        elif(node['_type'] == 'Call'):
-            return self.visit_Call(node)
-        elif(node['_type'] == 'Constant'):
-            return set()
-        elif(node['_type'] == 'Name'):
-            return set([node['id']])
-            
-    def visit_BoolOp(self, node):
-        ans = set()
-        for value in node['values']:
-            ans = ans.union(self.findVariables(value))
-        return ans
-            
-    def visit_BinOp(self, node):
-        ans = set()
-        ans = ans.union(self.findVariables(node['right']))
-        ans = ans.union(self.findVariables(node['left']))
-        return ans
-    
-    def visit_UnaryOp(self, node):
-        ans = set()
-        ans = ans.union(self.findVariables(node['operand']))
-        return ans
-    
-    def visit_Call(self, node):
-        ans = set()
-        for arg in node['args']:
-            ans = ans.union(self.findVariables(arg))
-            
-        for keyword in node['keywords']:
-            ans = ans.union(self.findVariables(keyword['value']))
-            
-        return ans
-            
-    def visit_Compare(self, node):
-        ans = set()
-        ans = ans.union(self.findVariables(node['left']))
-        for cmp in node['comparators']:
-            ans = ans.union(self.findVariables(cmp))
-        
-        return ans
-            
