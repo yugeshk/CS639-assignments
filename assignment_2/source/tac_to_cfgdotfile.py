@@ -1,7 +1,7 @@
 """
 Converts a Three-Address-Code file to CFG and outputs as .dot and .png (or other format as specified)
 Usage : python tac_to_cfgdotfile.py <filename>.tac <filename>.dot <filename>.png (or .pdf etc)
-Supported formats : png, 
+Supported formats : png,
 """
 
 import sys
@@ -41,7 +41,7 @@ def add_tac_BasicBlocks(cfg, tac_BBlist):
                 rem_instr = groups[2]
                 label_attr += ' ' + tac_label + '\\l'
                 if rem_instr != '':
-                    label_attr += '  ' + rem_instr + '\\l'
+                    label_attr += '  ' + escape_string(rem_instr) + '\\l'
             else:
                 label_attr += '  ' + escape_string(i) + '\\l'
         label_attr += '}"'
@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
         #Add Edges to the cfg
         add_tac_edges(cfg, tac_edgelist)
-        
+
     with open(dot_filename, 'w') as dotfile:
         dotfile.write(cfg.to_string())
 
@@ -83,5 +83,5 @@ if __name__ == "__main__":
     output_format = output_format[1:] #to remove the starting .
     check_call(['dot', '-T{}'.format(output_format), dot_filename, '-o', cfg_filename])
 
-    
+
 
