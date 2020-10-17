@@ -49,9 +49,7 @@ class VariableFinder():
             ans = ans.union(self.findVariables(cmp))
         
         return ans
-
-
-        self.node = node
+    
 
 class Statement():
     def __init__(self, text, node):
