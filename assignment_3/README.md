@@ -14,23 +14,23 @@
 
 1. We conservatively avoid eliminating any Assignment statements that have `function_calls` in their RHS. This is because function calls may have side effects, e.g., it may print variables. One alternative (in `python--`) was to do the following (assuming `a` is faint in this case):
 
-    a = b + foo(c,d)
+        a = b + foo(c,d)
     
-gets optimized to :
+    gets optimized to :
 
-    b + foo(c,d)
+        b + foo(c,d)
 
 but we decide against doing it because that would violate `python--` grammar (`python--` contain only *assignment statements*, *if-then*, *if-then-else*, *while loops* and *function calls*, but removing the assignment would reduce it to an *expression*).
 
 2. Our Faint Variable Optimization may leave empty comditional or loop blocks that look like this:
 
-    while:
-        pass
+        while:
+            pass
         
-    if:
-        pass
-    else:
-        pass
+        if:
+            pass
+        else:
+            pass
 
 We leave these blocks intentionally, since we acknowledge that optimizing these blocks away is not part of a **Faint Varible Optimization** pass. Moreover, the requirement in the problem statement was to:
 
