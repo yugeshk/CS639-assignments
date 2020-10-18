@@ -60,7 +60,7 @@ To clean the base directory, simply run:
 
     ./clean.sh
 
-This will remove all optimized source files (that follow the naming convention `<filename>_optimized.py`)
+This will remove all optimized source files that follow the naming convention `<filename>_optimized.py` in the directory.
 
 
     
