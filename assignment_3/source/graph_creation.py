@@ -1,3 +1,11 @@
+import sys
+import os
+import ast
+import ast2json
+from analysis import FaintVariableAnalyzer
+from optimizer import OptimizedPrinter
+from syntax_checker import Syntax_Checker
+
 class VariableFinder():
     def findVariables(self, node):
         if(node['_type'] == 'BoolOp'):
@@ -50,6 +58,51 @@ class VariableFinder():
         
         return ans
     
+class FunctionCallFinder():
+    def hasFunctionCall(self, node):
+        if(node['_type'] == 'BoolOp'):
+            return self.visit_BoolOp(node)
+        elif(node['_type'] == 'BinOp'):
+            return self.visit_BinOp(node)
+        elif(node['_type'] == 'UnaryOp'):
+            return self.visit_UnaryOp(node)
+        elif(node['_type'] == 'Compare'):
+            return self.visit_Compare(node)
+        elif(node['_type'] == 'Call'):
+            return self.visit_Call(node)
+        elif(node['_type'] == 'Constant'):
+            return False
+        elif(node['_type'] == 'Name'):
+            return False
+            
+    def visit_BoolOp(self, node):
+        ans = False
+        for value in node['values']:
+            ans = ans or (self.hasFunctionCall(value))
+        return ans
+            
+    def visit_BinOp(self, node):
+        ans = False
+        ans = ans or (self.hasFunctionCall(node['right']))
+        ans = ans or (self.hasFunctionCall(node['left']))
+        return ans
+    
+    def visit_UnaryOp(self, node):
+        ans = False
+        ans = ans or (self.hasFunctionCall(node['operand']))
+        return ans
+    
+    def visit_Call(self, node):
+        ans = True
+        return ans
+            
+    def visit_Compare(self, node):
+        ans = False
+        ans = ans or (self.hasFunctionCall(node['left']))
+        for cmp in node['comparators']:
+            ans = ans or (self.hasFunctionCall(cmp))
+        
+        return ans
 
 class Statement():
     def __init__(self, text, node):
@@ -57,16 +110,28 @@ class Statement():
         self.node = node
         self.defined = set()
         self.used = set()
+        self.fn_call_present = False
+        self.const_gen = set()
+        self.const_kill = set()
         var_finder = VariableFinder()
+        fn_call_finder = FunctionCallFinder()
+
         if(node == None):
             self.defined = set()
-            self.used = text.split('[')[1].split(']')[0]
+            self.used = set([text.split('[')[1].split(']')[0]])
+            self.const_kill = self.used.copy()
+
         elif(node['_type'] == 'Assign'):
             self.defined = set()
             for target in node['targets']:
                 self.defined = self.defined.union([target['id']])
                 
             self.used = var_finder.findVariables(node['value'])
+            self.fn_call_present = fn_call_finder.hasFunctionCall(node['value'])
+            self.const_gen = self.defined.difference(self.used)
+
+            if(self.fn_call_present):
+                self.const_kill = self.used.copy()
             
         elif(node['_type'] == 'AugAssign'):
             self.defined = set()
@@ -75,10 +140,15 @@ class Statement():
             self.used = set()
             self.used = self.used.union([node['target']['id']])
             self.used = self.used.union(var_finder.findVariables(node['value']))
+            self.fn_call_present = fn_call_finder.hasFunctionCall(node['value'])
+
+            if(self.fn_call_present):
+                self.const_kill = self.used.copy()
         
         elif(node['_type'] == 'Expr'):
             self.defined = set()
             self.used = var_finder.findVariables(node['value'])
+            self.const_kill = self.used.copy()
 
 class BasicBlock():
     def __init__(self):
@@ -149,8 +219,6 @@ class GraphGenerator():
             self.visit_Assign(node)
         elif(node_type == 'AugAssign'):
             self.visit_AugAssign(node)
-        elif(node_type == 'AnnAssign'):
-            self.visit_AnnAssign(node)
         elif(node_type == 'If'):
             if(len(node['orelse']) == 0):
                 self.visit_If(node)
@@ -290,3 +358,29 @@ class GraphGenerator():
         
     def format_lineno(self, node):
         return "At line " + str(node['lineno']) + " :"
+
+if __name__ == '__main__':
+    file_name = sys.argv[1]
+    with open(file_name, 'r') as f:
+        program = f.read()
+        program_ast = ast2json.str2json(program)
+        syntax_checker = Syntax_Checker()
+        syntax_checker.visit_Module(program_ast, program)
+        grapher = GraphGenerator()
+        grapher.visit_Module(program_ast, program)
+        fva = FaintVariableAnalyzer(grapher.graph)
+        fva.run_optimizer()
+        print("Completed faint variable analysis.")
+        printer = OptimizedPrinter()
+        printer.visit_Module(program_ast, program)
+
+        if len(sys.argv) == 2:
+            output_filename, _ = os.path.splitext(file_name)
+            output_filename += "_optimized.py"
+        elif len(sys.argv) == 3:
+            output_filename = sys.argv[2]
+        else:
+            print("Incorrect number of arguements passed. Check usage.")
+        
+        with open(output_filename, 'w') as op:
+            op.write(printer.opt_text)

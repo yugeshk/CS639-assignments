@@ -1,0 +1,81 @@
+PSUEDO CODE:
+
+run_fixpoint_iter:
+    1. while (true):
+    2.  for bb in basicblock-{END}:
+    3.      compute newOUT, newIN := run_over_bb(bb)
+    4.      if(diff(newOUT, OUT) && diff(newIN, IN)):
+    5.          IN, OUT := newIN, newOUT
+    7.          continue
+    8.      else:
+    9.          break
+
+run_over_bb:
+    0. currOUT=OUT 
+    1. for stmt in bb.reverse_order:
+    2.      DepKill_stmt(currOUT) = //compute DepKill
+    3.      currIN = (currOUT - (stmt.ConstKill U DepKill)) U (ConstGen)
+    4.      currOUT = currIN
+    5. end
+    6. ret currOUT
+
+/* Kill and Gen functions */
+
+//ConstKill
+****
+Add following to class Statement:
+- Function call parameters (self.fn_call_present)
+*For non-assignment statements this is not necessary (or will not be checked). Will be PHI if Fn_call not present.
+****
+
+1. Assign - used (will be phi if function call is not present)
+2. AugAssign - used (will be phi if function call is not present)
+3. Branch - used
+4. Call - used
+
+//ConstGen
+1. Assignment - (defined - used)
+2. AugAssign - phi (because {defined - used} = phi in this case always)
+3. Branch - phit
+4. Call - phi //overapproximate but safe
+
+//DepKill - input is currOUT
+1. Assignment - if (defined - currOut) is not phi then used, else phi 
+2. AugAssign - if (defined - currOut) is not phi then used, else phi 
+3. Branch - phi
+4. Call - phi.
+
+Example:
+
+In the case of a = b = c = a+c+d : then a,b,c are all in LHS. Suppose only a,b are in currOUT
+and c is not in currOUT. In this case DepKill = (c,d)
+
+
+/* Optimisation*/
+
+if node['_type'] == 'AugAssign' :
+    if(not stmnt.has_fn_call):
+        if(assignment is dead_1):
+            node['dead'] = true
+        else:
+            node['dead'] = false
+    else:
+        node['dead'] = False
+
+elif(node['_type']) == 'Assign' and :
+    if(not stmnt.has_fn_call)
+        for target in node['targets']:
+            if target is dead_2:
+                target['dead'] = True
+            else:
+                target['dead'] = False
+    else:
+        for target in node['targets']:
+            target['dead'] = False 
+
+assignment is dead_1:(for augassign)
+    node['target']['id'] in stmt.out
+
+
+target is dead_2:(for assign)
+    target['id'] in stmnt.out
