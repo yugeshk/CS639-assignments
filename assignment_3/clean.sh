@@ -1,3 +1,3 @@
 #!/bin/bash
 
-find . | grep "_optimized.py" | xargs rm
+find . | grep "_optimized.py" | grep -v "testcases" | xargs rm
