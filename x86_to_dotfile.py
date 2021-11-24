@@ -134,6 +134,8 @@ def print_textfile():
             while objdump[curr_instr_index][0] <= basic_blocks[x][2]:
                 text_file.write("{}\l".format(escape_string(objdump[curr_instr_index][1])))
                 curr_instr_index += 1
+                if(curr_instr_index > len(objdump)):
+                    break
             #close the label
             text_file.write("}\"];\n")
             for y in range(0,basic_block_ctr):
